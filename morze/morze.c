@@ -45,7 +45,7 @@ int main(void)
             }
         }
 
-        *str++; //not (*str)++ 2 hours kill =)
+        str++; //fix
     }
 
     free(st_str);
