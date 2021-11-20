@@ -1,13 +1,48 @@
 /* write file */
+<<<<<<< HEAD
+
+#include <stdio.h>
+#include <errno.h>
+
+
+int main()
+{
+=======
 #include <stdio.h>
 int main()
 {
     char *filename = "clients.dat";
+>>>>>>> df35165bcf714dc4c2b32537fbbc89349fedbe07
     int account;
     char name[30];
     float balance;
     FILE *cfPtr;
 
+<<<<<<< HEAD
+    if( (cfPtr = fopen("file.txt","w")) == NULL)
+    {
+         printf("Error %d \n", errno);
+         printf("file not open\n");
+    }
+        
+    else
+    {
+        printf("Enter acc, name, balance.\n");
+        printf("Enter OF to end input.\n");
+        printf("=>  ");
+        scanf("%d%s%f", &account, name, &balance);
+
+        while(!feof(stdin)) 
+        {
+            fprintf(cfPtr, "%d %s %.2f\n", account, name, balance);
+            printf("=> ");
+
+         scanf("%d%s%f", &account, name, &balance);
+        }
+        
+        fclose(cfPtr);
+
+=======
     /* Создадим или допишем в файл */
     if ((cfPtr = fopen(filename, "a+")) == NULL)
         printf("%s not open\n", filename);
@@ -103,6 +138,7 @@ int main()
 
         printf("End\n");
         fclose(cfPtr);
+>>>>>>> df35165bcf714dc4c2b32537fbbc89349fedbe07
     }
 
     return 0;
