@@ -1,1 +1,1 @@
-# C_tutorial
+# algorithms and training on C
