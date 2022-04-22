@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <ctype.h>
 
-char big_text[] = "HELLO, THIS IS BIG DATA, PLS MAKE ME SMALLER";
+char big_text1[] = "HELLO, THIS IS BIG DATA, PLS MAKE ME SMALLER";
+char big_text2[] = "PAM PAPAM PAPAPAPAPAM";
 
 typedef struct coord
 {
@@ -45,10 +46,15 @@ int main(int argc, char const *argv[])
     printf("=========================\n");
     printf("\n");
     printf("PART2\n");
-    printf("source data = %s\n", big_text);
+    printf("source data = %s\n", big_text1);
     ptr_f = ToBigger;
-    show_string(ToLower, big_text);
-    show_string(ptr_f, big_text);
+    show_string(ToLower, big_text1);
+    show_string(ptr_f, big_text1);
+
+    ptr_f = ToLower;
+    printf("%s\n", big_text2);
+    (*ptr_f)(big_text2);
+    printf("%s\n", big_text2);
     return 0;
 }
 
