@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Skip to content
 Search or jump to…
 Pull requests
@@ -90,3 +91,24 @@ API
 Training
 Blog
 About
+=======
+# Byte-compiled 
+*.out
+*.exe
+*.bin
+
+# C extensions
+*.so
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# vscode 
+.vscode/
+>>>>>>> 4659a2e445fc17eb5c828aea1e02a92a1c987595
