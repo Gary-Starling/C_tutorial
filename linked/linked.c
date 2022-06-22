@@ -32,7 +32,7 @@ struct listN *addelem(struct listN *lst, char number)
 {
 
     struct listN *new, *temp;
-    new = (struct listN *)malloc(sizeof(struct listN));
+    new = (struct listN *)malloc(sizeof(struct listN)); //Выделим
     temp = lst->next;   // сохранение указателя на следующий узел
     lst->next = new;    // предыдущий узел привязали к новому
     new->data = number; // сохранение поля данных добавляемого узла
