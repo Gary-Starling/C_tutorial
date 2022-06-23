@@ -1,5 +1,5 @@
 /******************************************************************************
-Round Robin scheduler and queue 
+Round Robin scheduler and queue http://olymp-programming.blogspot.com/2016/04/blog-post.html
 *******************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,7 +25,6 @@ typedef struct queue myQ;
 
 myQ taskQueue;
 
-//УКАЗАТЕЛь на указатель????
 void PushQ(int _data, myQ *q);
 void PopQ(myQ *q);
 bool QisEmpty(myQ *q);
@@ -46,11 +45,27 @@ int main()
     PushQ(25, &taskQueue);
     PushQ(35, &taskQueue);
 
-
-    if (QisEmpty(&taskQueue))
+    if(QisEmpty(&taskQueue))
         printf("queue is empty\n");
-    else    
+    else
         SwhoQ(&taskQueue);
+
+    printf("\npop elem\n");
+    PopQ(&taskQueue);  
+    SwhoQ(&taskQueue);  
+
+    printf("\npop elem\n");
+    PopQ(&taskQueue);  
+    SwhoQ(&taskQueue); 
+
+    printf("\npop elem\n");
+    PopQ(&taskQueue);  
+    SwhoQ(&taskQueue); 
+
+
+    printf("\npop elem\n");
+    PopQ(&taskQueue);  
+    SwhoQ(&taskQueue); 
 
     return 0;
 }
@@ -175,13 +190,9 @@ int current_thread()
     return curr_thread_id;
 }
 
-
-
-
-
 /**
- * @brief Функция добавляет данные в конец(Хвост очереди) 
- * 
+ * @brief Функция добавляет данные в конец(Хвост очереди)
+ *
  * @param data - данные в очередь
  * @param q - указатель на очерь
  */
@@ -191,26 +202,27 @@ void PushQ(int _data, myQ *q)
 
     if (QisEmpty(q)) //Очедь пуста
     {
-        IntiQ(q);   
-        /* При добавлении первого элемена голова и хвост указывают на одно и тоже */ 
+        IntiQ(q);
+        /* При добавлении первого элемена голова и хвост указывают на одно и тоже */
         q->tail = q->head = (struct list *)malloc(sizeof(struct list));
-        //TODO:Тут должна быть проверка на NULL
+        // TODO:Тут должна быть проверка на NULL
         q->tail->data = _data; //Вставим данные
-        q->tail->next = NULL; //Следующи указатель должен быть NULL
+        q->tail->next = NULL;  //Следующи указатель должен быть NULL
     }
     else
     {
-        // struct list *tmp = NULL;
-        // /* */
-        // tmp = (struct list *)malloc(sizeof(struct list));
-        // //TODO:проверка на выделение
-        // q->tail->next = tmp; // Следующий элемент "в хвосте" получает адрес выделенной памяти
-        // tmp->next = NULL;    // Следующий элемент указывает на null
-        // tmp->data = _data;   // Загрузим данные
-        // q->tail = tmp;       // И хвост теперь указывает на последний элемент
+        struct list *tmp = NULL;
 
-        /* tail всегда смотрит в конец наверное такая конструкция лучше сли иди по head*/
-        
+        tmp = (struct list *)malloc(sizeof(struct list));
+        // TODO:проверка на выделение
+        q->tail->next = tmp; // Следующий пустой элемент "в хвосте" получает адрес выделенной памяти
+        tmp->next = NULL;    // Следующий элемент за созданным указывает на null
+        tmp->data = _data;   // Загрузим данные в наш элемент
+        q->tail = tmp;       // И хвост теперь указывает на последний элемент
+
+        /* Если работали бы как со стеком, то передвали бы верхушку и "на ней" определяли новые данные*/
+
+        /* Такая конструкция больше подходит для head?
         while(q->tail->next != NULL)
         {
             q->tail = q->tail->next;
@@ -219,10 +231,17 @@ void PushQ(int _data, myQ *q)
         //TODO:проверка на выделение
         q->tail->next->data = _data;
         q->tail->next->next = NULL;
-        
+        */
     }
 }
 
+/**
+ * @brief Функция возращеет true, если очередь пуста
+ *
+ * @param q - указатель на очерь
+ * @return true
+ * @return false
+ */
 bool QisEmpty(myQ *q)
 {
     if (q->head == NULL)
@@ -231,6 +250,11 @@ bool QisEmpty(myQ *q)
         return FALSE;
 }
 
+/**
+ * @brief Функция инициализирует "указатели хвоста и голвы" значением NULL
+ *
+ * @param q
+ */
 void IntiQ(myQ *q)
 {
     q->tail = q->head = NULL;
@@ -239,39 +263,59 @@ void IntiQ(myQ *q)
 /**
  * @brief Функция выводит все значения в очереди
  *   Это эфермный пример, адреса с потолка
-        HEAD(q.head = 0x9A0)  
+        HEAD(q.head = 0x9A0)
         n0{
             d = 10
             next_ptr = 0x9B0
         }
             step1 q.head = q.head->next_ptr
-                HEAD(q.head = 0x9B0)  
+                HEAD(q.head = 0x9B0)
                     n0{
                     d = 20
                     next_ptr = 0x9C0
                 }
                     step2 q.head = q.head->next_ptr
-                    HEAD(q.head = 0x9C0)  
+                    HEAD(q.head = 0x9C0)
                      n0{
                      d = 30
                      next_ptr = 0x9D0
                     }
- * @param q - указатель на структуру типа myQ 
+ * @param q - указатель на структуру типа myQ
  */
 void SwhoQ(myQ *q)
 {
-    unsigned int number = 0;       //Счётчик индекс показывающий номер эл-та с головы
-    struct list * showq = q->head; //Временная переменная чтобы не трогать Head указатель
+    unsigned int number = 0;      //Счётчик индекс показывающий номер эл-та с головы
+    struct list *showq = q->head; //Временная переменная чтобы не трогать Head указатель
 
-    if(showq == NULL)               
+    if (QisEmpty(q))
         printf("Queue is empty\n");
     else
     {
-        while(showq != NULL)
+        while (showq != NULL)
         {
-            printf("[%d] element in queue : %d\n",number++, showq->data);
-            showq = showq->next;    //Переставим указатель на следующий элемнт
+            printf("[%d] element in queue : %d. next address: %p\n", number++, showq->data, showq->next);
+            showq = showq->next; //Переставим указатель на следующий элемнт
         }
     }
 }
 
+/**
+ * @brief Удаляет из очереди элемент находящийся
+ *
+ *
+ * @param q - указатель на структуру типа myQ
+ */
+void PopQ(myQ *q)
+{
+        struct list *temp = NULL;
+
+    if (QisEmpty(q))
+        printf("Queue is empty\n");
+    else
+    {
+        temp = q->head;          // Временное хранение головного элемента
+        q->head = q->head->next; // Переставим указатель "Головы" на следующий элемент
+        free(temp);              // Освободим память
+    }
+    //тут можно вывести значение удалённого элемента
+}
