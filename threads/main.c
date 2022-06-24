@@ -1,5 +1,5 @@
 /******************************************************************************
-Round Robin scheduler and queue http://olymp-programming.blogspot.com/2016/04/blog-post.html
+Round Robin scheduler and queue
 *******************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,49 +23,64 @@ struct queue
 
 typedef struct queue myQ;
 
-myQ taskQueue;
-
 void PushQ(int _data, myQ *q);
-void PopQ(myQ *q);
+int PopQ(myQ *q);
 bool QisEmpty(myQ *q);
 void IntiQ(myQ *q);
 void SwhoQ(myQ *q);
 
+myQ taskQueue;
 int curr_thread_id; //Текущий поток выполнения, при установке (-1)
 int cvant;
 int ticks;
 
+void switch_thread();
+void scheduler_setup(int timeslice);
+void new_thread(int thread_id);
+void exit_thread();
+void block_thread();
+void wake_thread(int thread_id);
+void timer_tick();
+int current_thread();
+
 int main()
 {
-    if (QisEmpty(&taskQueue))
-        printf("queue is empty\n");
+    scheduler_setup(1);
+    new_thread(1);
+    new_thread(2);
+    new_thread(3);
+    printf("current thread = %d\n", curr_thread_id);
 
-    PushQ(10, &taskQueue);
-    PushQ(15, &taskQueue);
-    PushQ(25, &taskQueue);
-    PushQ(35, &taskQueue);
+    for (size_t i = 0; i < 5; i++)
+    {
+        timer_tick();
+        printf("current thread = %d\n", curr_thread_id);
+    }
 
-    if(QisEmpty(&taskQueue))
-        printf("queue is empty\n");
-    else
-        SwhoQ(&taskQueue);
+    for (size_t i = 0; i < 5; i++)
+    {
+        timer_tick();
+        block_thread();
+        printf("current thread = %d\n", curr_thread_id);
+    }
 
-    printf("\npop elem\n");
-    PopQ(&taskQueue);  
-    SwhoQ(&taskQueue);  
+    wake_thread(1);
+    wake_thread(2);
+    wake_thread(3);
 
-    printf("\npop elem\n");
-    PopQ(&taskQueue);  
-    SwhoQ(&taskQueue); 
+    for (size_t i = 0; i < 5; i++)
+    {
+        timer_tick();
+        printf("current thread = %d\n", curr_thread_id);
+    }
 
-    printf("\npop elem\n");
-    PopQ(&taskQueue);  
-    SwhoQ(&taskQueue); 
+    exit_thread();
 
-
-    printf("\npop elem\n");
-    PopQ(&taskQueue);  
-    SwhoQ(&taskQueue); 
+    for (size_t i = 0; i < 5; i++)
+    {
+        timer_tick();
+        printf("current thread = %d\n", curr_thread_id);
+    }
 
     return 0;
 }
@@ -74,15 +89,10 @@ void switch_thread()
 {
     ticks = 0;
 
-    // if () //если в очереди что-то есть?
-    // {
-    // //текущий элемент очереди (front) = curr_thread_id
-    // //вытащить элемент из очереди
-    // }
-    // else
-    // {
-    // curr_thread_id = -1; //Потоков на выполнение нет
-    // }
+    if (QisEmpty(&taskQueue))
+        curr_thread_id = -1; //Потоков на выполнение нет
+    else
+        curr_thread_id = PopQ(&taskQueue);
 }
 
 /**
@@ -98,7 +108,7 @@ void switch_thread()
  **/
 void scheduler_setup(int timeslice)
 {
-    //тут выделим память под новый поток
+    IntiQ(&taskQueue);
     cvant = timeslice;   //Используемый квант времени
     ticks = 0;           //Сбросим счётчик тиков
     curr_thread_id = -1; //пока не создано ни одного потока
@@ -117,7 +127,7 @@ void new_thread(int thread_id)
     }
     else
     {
-        //засунуть в очередь thread_id
+        PushQ(thread_id, &taskQueue);
     }
 }
 
@@ -158,7 +168,7 @@ void wake_thread(int thread_id)
     }
     else
     {
-        //кладём в очередь
+        PushQ(thread_id, &taskQueue);
     }
 }
 
@@ -168,12 +178,16 @@ void wake_thread(int thread_id)
  **/
 void timer_tick()
 {
+
+    if (curr_thread_id == -1)
+        return;
+
     ticks++;
 
     if (ticks >= cvant)
     {
         ticks = 0;
-        //кладём в очередь
+        PushQ(curr_thread_id, &taskQueue);
         switch_thread();
     }
 }
@@ -305,17 +319,22 @@ void SwhoQ(myQ *q)
  *
  * @param q - указатель на структуру типа myQ
  */
-void PopQ(myQ *q)
+int PopQ(myQ *q)
 {
-        struct list *temp = NULL;
+    struct list *temp = NULL;
+    int _data = 0;
 
     if (QisEmpty(q))
+    {
         printf("Queue is empty\n");
+    }
     else
     {
-        temp = q->head;          // Временное хранение головного элемента
+        temp = q->head; // Временное хранение головного элемента
+        _data = temp->data;
         q->head = q->head->next; // Переставим указатель "Головы" на следующий элемент
         free(temp);              // Освободим память
     }
-    //тут можно вывести значение удалённого элемента
+
+    return _data;
 }
