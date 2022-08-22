@@ -1,40 +1,120 @@
+#include <stdlib.h>
 #include <stdio.h>
+//Тут мы уже передаём адрес самого указателя
+//Разъименовываем его, и по разъименованному адресу (там null) ,выделяем память
+//потом дважды разъименовывываем ** и пишем значение
+//в результате по переданному адресу указателя выделили память
+void alloc2(int **p)
+{
+    *p = (int *)malloc(sizeof(int));
+    **p = 10;
+}
+
+//Тут мы передали скопированное значение пустого указателя, т.е. в параметр по значению
+//мы передали адрес NULL, мы не взяли какой-то адрес и разъименовали его
+//а фактически мы взяли локальный p = NULL; с локальным адресом на стеке, можно посмотреть адрес &p внутри и адрес вне функции
+//получается локальному указатлю p с адресом на стеке, который будет потерян после выхода, мы присваеваем адрес
+//выделяемой памяти, тут же получаем "утечку" памяти
+void alloc1(int *p)
+{
+    p = (int *)malloc(sizeof(int));
+    *p = 10;
+}
+
+//внутри функции мы имеем копии a и b(передача по значению)
+//после выхода из функции значения a и b вне её не поменяется
+//мы присвоили локальным переменным(копиям) значения и вышли
+void func1(int a, int b)
+{
+    a = 10;
+    b = 20;
+}
+//в этой функции аргументы указатель типа int
+//мы можем передать адрес переменной например &a
+//а можем передать указаталь ptr_a, который в свою очередь и является адресом
+//внутри функции мы получаем копию адреса, разъименовываем его, инкрементируем
+//в результате переменные поменяются не только внутри, но и снаружи
+void func2(int *a, int *b)
+{
+    (*a)++;
+    (*b)++;
+}
+//Тут мы передаём указатель(фактически адрес) типа int, на указатель типа int
+//в функции получаем копии адресов, т.е. при двойном **, добираемся до переменной которую изменяем
+//разъименовали 1 раз(1й адрес), получили по адресу значение второго указателя, 
+//разъименовали  снова и по этому адресу добрались до места где храним переменную
+void func3(int **a, int **b, int c)
+{
+    **a = c;
+    **b = c;
+}
 
 int main()
 {
+    //PART1    //PART1    //PART1    //PART1    //PART1
+    /* var */
+    int a = 0;
+    int b = 0;
+    /* var */
 
-    int c = 1;
-    int d = 2;
-    int e = 3;
-    int * a = &c;
-    int * b = &d;
-    int * f = &e;
-    int ** pp = &a;  // pointer to pointer 'a'
+    /* ptr on var */
+    int *ptr_a = &a;
+    int *ptr_b = &b;
 
-    printf("\n a value: %x \n", a);
-    printf("\n b value: %x \n", b);
-    printf("\n f value: %x \n", f);
-    printf("\n can we change a?, lets see \n");
-    printf("\n a = b \n");
-    a = b;
-    printf("\n a value is now: %x, same as 'b'... it seems we can, but can we do it in a function? lets see... \n", a);
-    printf("\n cant_change(a, f); \n");
-    cant_change(a, f);
-    printf("\n a value is now: %x, Doh! same as 'b'...  that function tricked us. \n", a);
+    int **pptr_a = &ptr_a;  //берём адрес другого указателя(pptra = adr(ptra) .. ptra = adr(a) )
+    int **pptr_b = &ptr_b;  //Анлогия
 
-    printf("\n NOW! lets see if a pointer to a pointer solution can help us... remember that 'pp' point to 'a' \n");
-     printf("\n change(pp, f); \n");
-    change(pp, f);
-    printf("\n a value is now: %x, YEAH! same as 'f'...  that function ROCKS!!!. \n", a);
+    int ***ppptr_a = &pptr_a; //На уровень выше
+    int ***ppptr_b = &pptr_b;
+    /* ptr on var */
+
+
+    func1(a, b);
+    //a и b не поменялись
+    func2(&a, &b); //Передали адрес a и b
+    //а и b изменились, равны 1
+
+    /* Чтобы было понятно */
+    if( (&a != ptr_a) || (ptr_b != &b) )
+     exit(1);
+
+    func2(ptr_a, ptr_b); //Передали указатели, которые явлются адресом
+    //а и b изменились, равны 2
+
+    func3(pptr_a, pptr_b, 10); //Передали указатели, которые явлются адресом других указателей
+    // a и b равны 10
+
+    /* Разъименуем указатель на указатель, 1 раз, таким образом мы получим 
+    адрес на следующий указатель, а значит можем его передать в func2, по 
+    сигнатуре она нам подходит*/
+    func2(*pptr_a, *pptr_b);
+
+    /* Тоже самое сделаем для func3 разъименовали 1 раз, получили адрес pptrb*/
+    func3(*ppptr_a, *ppptr_b, 20);
+      // a и b равны 20
+
+    //PART1    //PART1    //PART1    //PART1    //PART1  
+
+
+    //PART2    //PART2    //PART2    //PART2    //PART2
+    int * ptr_alloc = NULL; //Пустой указатель, по какому-то адресу хранит NULL, не указывает никуда
+    int ** pptr_alloc = &ptr_alloc;
+
+    int * ptrN_alloc = NULL;
+    int ** pptN_alloc = &ptrN_alloc;
+
+    alloc1(ptr_alloc);
+    //printf("*p = %d\n", *ptr_alloc); segmentation fault
+    alloc2(&ptr_alloc);
+
+    alloc2(pptN_alloc);
+
+
+    printf("*(&pptr_alloc) = %d\n", **(&ptr_alloc)); 
+    printf("** pptr_alloc = %d\n", **pptr_alloc); 
+    printf("* ptr_alloc = %d\n", *ptr_alloc); 
+    printf("** pptN_alloc = %d\n", **pptN_alloc); 
+
+    //PART2    //PART2    //PART2    //PART2    //PART2  
     return 0;
-}
-
-void cant_change(int * x, int * z){
-    x = z;
-    printf("\n ----> value of 'a' is: %x inside function, same as 'f', BUT will it be the same outside of this function? lets see\n", x);
-}
-
-void change(int ** x, int * z){
-    *x = z;
-    printf("\n ----> value of 'a' is: %x inside function, same as 'f', BUT will it be the same outside of this function? lets see\n", *x);
 }

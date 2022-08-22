@@ -109,6 +109,9 @@ ENV/
 env.bak/
 venv.bak/
 
+# json
+*.json
+
 # vscode 
 .vscode/
 >>>>>>> 4659a2e445fc17eb5c828aea1e02a92a1c987595
