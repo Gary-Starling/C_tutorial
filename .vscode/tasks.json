@@ -8,8 +8,7 @@
                 "-fdiagnostics-color=always",
                 "-g",
                 "-Wall",
-                "main.c",
-                "current.c",
+                "queue.c",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe"
             ],
