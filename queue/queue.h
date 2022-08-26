@@ -34,10 +34,10 @@ bool QisEmpty(const queue * pq);
 int QItemCnt(const queue * pq);
 
 /* add item in queue */
-bool EnQueue(ItemInfo item, queue * pq);
+bool EnQueue(ItemInfo data, queue *pq);
 
 /* delete item from queue */
-ItemInfo DeQueue(queue * pq);
+bool DelQueue(ItemInfo * data, queue *pq);
 
 /* clear all queue */
 void ClearQueue(queue * pq);

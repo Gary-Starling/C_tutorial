@@ -53,7 +53,7 @@ bool EnQueue(ItemInfo data, queue *pq)
     if (QisFull(pq))
         return false;
     else
-        new = (Node *)malloc(sizeof(Node));
+        new = (Node *)malloc(sizeof(Node)); // create
 
     if (new == NULL)
     {
@@ -62,15 +62,15 @@ bool EnQueue(ItemInfo data, queue *pq)
     }
     else
     {
-        strcpy(new->item.name, data.name);
-        new->next = NULL;
+        strcpy(new->item.name, data.name); // copy data
+        new->next = NULL;                  // end list
 
         if (QisEmpty(pq))
             pq->head = new;
         else
-            pq->tail->next = new;
+            pq->tail->next = new; // current node pointer to new
 
-        pq->tail = new;
+        pq->tail = new; // current pointer now is new(last pointer)
 
         pq->cnt++;
     }
@@ -78,23 +78,91 @@ bool EnQueue(ItemInfo data, queue *pq)
     return true;
 }
 
+/**
+ * @brief
+ *
+ * @param data
+ * @param pq
+ * @return true
+ * @return false
+ */
+bool DelQueue(ItemInfo *data, queue *pq)
+{
+    Node *tmp;
+
+    if (QisEmpty(pq))
+        return false;
+
+    strcpy(data->name, pq->head->item.name); // data which will delete
+
+    tmp = pq->head;
+
+    pq->head = pq->head->next;
+
+    free(tmp);
+
+    pq->cnt--;
+
+    if (pq->cnt == 0)
+    {
+        pq->tail = NULL;
+        pq->head = NULL;
+    }
+
+    return true;
+}
+
+void ClearQueue(queue *pq)
+{
+    ItemInfo some;
+
+    while (pq->cnt != 0)
+    {
+        DelQueue(&some, pq);
+    }
+}
+
 int main(int argc, char const *argv[])
 {
     queue myQ;
 
-    ItemInfo test1 = {
-        .name = "test1\0"};
+    ItemInfo tmp;
 
-    ItemInfo test2 = {
-        .name = "test2\0"};
+    ItemInfo data1 = {
+        .name = "somebody"};
 
-    ItemInfo test3 = {
-        .name = "test3\0"};    
+    ItemInfo data2 = {
+        .name = "once"};
+
+    ItemInfo data3 = {
+        .name = "told"};
+
+    ItemInfo data4 = {
+        .name = "me"};
 
     InitQ(&myQ);
-    EnQueue(test1, &myQ);
-    EnQueue(test2, &myQ);
-    EnQueue(test3, &myQ);
+    EnQueue(data1, &myQ);
+    EnQueue(data2, &myQ);
+    EnQueue(data3, &myQ);
+    EnQueue(data4, &myQ);
+    DelQueue(&tmp,&myQ);
+
+    while (myQ.cnt != 0)
+    {
+        DelQueue(&tmp, &myQ);
+        printf("%s ", tmp.name);
+    }
+
+    printf("\n");
+
+    EnQueue(data1, &myQ);
+    EnQueue(data2, &myQ);
+    EnQueue(data3, &myQ);
+    EnQueue(data4, &myQ);
+
+    printf("item in queue = %d\n", QitemCnt(&myQ));
+    ClearQueue(&myQ);
+    printf("item in queue = %d\n", QitemCnt(&myQ));
 
     return 0;
 }
