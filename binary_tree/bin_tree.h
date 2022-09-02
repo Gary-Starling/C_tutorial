@@ -7,7 +7,7 @@
 #define MAX_SIZE    (10U)
 
 typedef struct sData {
-    int value;
+    int age;
     char name[20];
 } sData;
 
@@ -27,9 +27,25 @@ typedef struct sTree
 }Tree;
 
 /**/
-void InitTree(Tree * ptrRoot);
+void InitTree(Tree * ptT);
 
 /**/
+bool TreeIsEmpty(const Tree * ptT);
+
+/**/
+bool TreeIsFull(const Tree * ptT);
+
+/**/
+unsigned int ItemTree(const Tree * ptT);
+
+/**/
+bool AddItemTree(Tree * ptT, sData data);
+
+/**/
+bool SearchItemTree(const Tree * ptT, sData data);
+
+/**/
+bool RemoveItemTree(const Tree * ptT, sData data);
 
 
 #endif
