@@ -6,23 +6,16 @@
 
 #define MAX_SIZE    (10U)
 
-typedef struct sData {
-    int age;
-    char name[20];
-} sData;
-
-struct sleaf
+typedef struct sleaf
 {
-    sData data;
-    struct sleaf * leaf;
+    int value;
+    struct sleaf * left;
     struct sleaf * right;
-};
-
-typedef struct sleaf sLeaf;
+}Sleaf;
 
 typedef struct sTree
 {
-    sLeaf * root;
+    Sleaf * root;
     int size;
 }Tree;
 
@@ -38,14 +31,23 @@ bool TreeIsFull(const Tree * ptT);
 /**/
 unsigned int ItemTree(const Tree * ptT);
 
+
+
+bool Toleft(int val1, int val2);
+bool ToRight(int val1, int val2);
+void AddNode(Sleaf * new, Sleaf * root);
+bool IsBinary(Sleaf * root);
 /**/
-bool AddItemTree(Tree * ptT, sData data);
+bool AddItemTree(Tree * ptT, const int val);
+
+
+
 
 /**/
-bool SearchItemTree(const Tree * ptT, sData data);
+bool SearchItemTree(const Tree * ptT, const int val);
 
 /**/
-bool RemoveItemTree(const Tree * ptT, sData data);
+bool RemoveItemTree(const Tree * ptT, const int val);
 
 
 #endif
