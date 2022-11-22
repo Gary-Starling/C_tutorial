@@ -6,20 +6,38 @@
 int main(int argc, char const *argv[])
 {
     Tree tree;
-    printf("%p\n",&tree);
-    printf("%p\n",tree.root);
 
+    
     InitTree(&tree);
-    AddItemTree(&tree, 10);
-    AddItemTree(&tree, 20);
+    
+    printf("elements in tree = %d \n", ItemСntTree(&tree));
+
+    AddItemTree(&tree, 50);
+    AddItemTree(&tree, 40);
+    AddItemTree(&tree, 60);
     AddItemTree(&tree, 30);
-    AddItemTree(&tree, 27);
+    AddItemTree(&tree, 20);
+    AddItemTree(&tree, 10);
+    AddItemTree(&tree, 32);
+
+    printf("elements in tree = %d \n", ItemСntTree(&tree));
 
     if(IsBinary(tree.root))
         printf("Is binary tree\n");
 
-    printf("%p\n",&tree);
-    printf("%p\n",tree.root);
+    printTree(tree.root);
+
+    if(SearchItemTree(tree.root, 30))
+        printf("30 in tree\n");
+    
+    if(SearchItemTree(tree.root, 20))
+        printf("20 in tree\n");
+    
+    if(SearchItemTree(tree.root, 10))
+        printf("10 in tree\n");
+    
+    if(SearchItemTree(tree.root, 22))
+        printf("22 in tree\n");
 
     return 0;
 }
@@ -56,6 +74,12 @@ bool ToRight(int val1, int val2)
         return false;
 }
 
+
+int ItemСntTree(const Tree * ptT)
+{
+    return ptT->size;
+}
+
 void AddNode(Sleaf *new, Sleaf *root)
 {
     if (Toleft(new->value, root->value))
@@ -90,6 +114,35 @@ bool IsBinary(Sleaf * root)
     return (IsBinary(root->left) && IsBinary(root->right));
 }
 
+void printTree(Sleaf * root)
+{
+    if(root)
+    {
+        printf("%d \n", root->value);
+        printTree(root->left);
+        printTree(root->right);
+    }
+}
+
+
+bool SearchItemTree(Sleaf * root, const int val)
+{   
+
+    if(root)
+    {
+        if(root->value == val)
+            return true;
+        else if(val < root->value)
+            SearchItemTree(root->left, val);
+        else if(val > root->value)
+            SearchItemTree(root->right, val);
+    }
+    else
+        return false;
+
+}
+
+
 
 bool AddItemTree(Tree *ptT, const int val)
 {
@@ -100,14 +153,12 @@ bool AddItemTree(Tree *ptT, const int val)
         fprintf(stderr, "Max size Tree\n");
         return false;
     }
-    /*
-    if (SearchItemTree(ptT, data))
-    {
 
-        fprintf(stderr, "Tree have this item <%s> \n", data.name);
-        return false;
-    }
-    */
+    //if (SearchItemTree(ptT, val))
+    //{
+    //    fprintf(stderr, "Tree have this item <%s> \n", val);
+    //    return false;
+    //}
 
     new = (Sleaf *)malloc(sizeof(Sleaf));
 
