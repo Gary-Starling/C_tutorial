@@ -69,6 +69,8 @@ void change(int ** x, int * z){
     *x = z;
 }
 */
+
+
 int push(STACKNODE **topPtr, int info)
 {
     STACKNODE *newPtr;
