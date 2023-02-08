@@ -1,77 +1,79 @@
 #include <stdio.h>
 #include <stdlib.h>
-
-struct list
-{
-    char * name;
-    struct list * next;
-};
-
-struct stack
-{
-    struct list * head;
-};
-
-
-void push(struct stack * s, char * name);
-//void pop(struct stack * s);
-void print_stack(struct stack * head);
-
-
+#include "main.h"
 
 int main(int argc, char const *argv[])
 {
-    
-    struct stack Stack;
-    Stack.head = NULL;
 
-    push(&Stack, "Igor");
-    push(&Stack, "Anna");
-    push(&Stack, "Egor");
-    push(&Stack, "Feta");
-    push(&Stack, "Rada");
-    push(&Stack, "TM");
-    print_stack(&Stack);
-   // pop(&Head);
-   // pop(&Head);
-   // print_stack(Head);
+    sStack *ptrHead = NULL;
+
+    push(&ptrHead, "Igor");
+    push(&ptrHead, "Anna");
+    push(&ptrHead, "Egor");
+    push(&ptrHead, "Feta");
+    push(&ptrHead, "Rada");
+    push(&ptrHead, "TM");
+
+    print_stack(&ptrHead);
+
+    printf("(%d) elemnts in stack\n", stack_size(&ptrHead));
+
+    pop(&ptrHead);
+    pop(&ptrHead);
     
+    print_stack(&ptrHead);
+
+    printf("(%d) elemnts in stack\n", stack_size(&ptrHead));
+
     return 0;
 }
 
-void push(struct stack * s, char * name)
+void push(sStack **head, char *name)
 {
-    struct list * new_el = (struct list *)malloc(sizeof(struct list));
+    sStack *new_el = (sStack *)malloc(sizeof(sStack));
 
-    if(new_el == NULL)
+    if (new_el == NULL)
     {
         printf("Error allocate memory\n");
         exit(1);
     }
-    
-    new_el->name = name;
-    new_el->next = s->head;
-    s->head = new_el;
-}
-
-
-void print_stack(struct stack * s)
-{
-    while (s->head != NULL)
+    else
     {
-        printf("data -> %s\n", s->head->name);
-        s->head = s->head->next;
+        new_el->name = name;
+        new_el->next = *head;
+        *head = new_el;
     }
 }
 
-/*
-void pop(struct stack ** head)
+void print_stack(sStack **head)
 {
-    struct stack * tmp = *head;
+    sStack *tmp_head = *head;
 
+    while (tmp_head != NULL)
+    {
+        printf("data -> %s\n", tmp_head->name);
+        tmp_head = tmp_head->next;
+    }
+}
+
+void pop(sStack **head)
+{
+    struct stack *tmp = *head;
     printf("delete item (%s)\n", (*head)->name);
     *head = (*head)->next;
     free(tmp);
 }
 
-*/
+int stack_size(sStack **head)
+{
+    int size = 0;
+    sStack *tmp_head = *head;
+
+    while (tmp_head != NULL)
+    {
+        size++;
+        tmp_head = tmp_head->next;
+    }
+
+    return size;
+}
