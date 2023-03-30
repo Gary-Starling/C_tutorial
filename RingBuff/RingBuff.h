@@ -4,11 +4,12 @@
 /* Интерефейс кольцевого буфера для UART */
 
 #include "stdint.h"
+#include "stm32f405xx.h"
 
 /* Настройки */
 #define RING_BUFF_LEN	(128U) 	          //Размер буфера
 #define _DMA_                             //_DMA_ or _INTERRUPT_ 
-typedef uint8_t data_type;                //тип данных в буфере
+typedef uint8_t data_type;                //тип данных в буфере 
 /* Настройки */
 
 typedef struct {
