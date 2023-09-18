@@ -1,6 +1,8 @@
 #ifndef _HASH_H
 #define _HASH_H
 
+#define DEBUG
+
 #include <stdint.h>
 #include <string.h>
 
@@ -26,12 +28,11 @@ typedef struct sHashItem Item;
 typedef struct
 {
     Item **cell; // array pointer
-    size_t cnt;  //
+    size_t cnt;  // сell counter. Just cells, not nodes.
     size_t size; // capacity
 } sHashTable;
 
 /* example
-
     HashTable.cnt;
     HashTable.size;
     HashTable.cell[0].key;
@@ -48,6 +49,6 @@ void insertItem(sHashTable *table, const char *data);
 Item *createItem(sHashTable *table, const char *data, const int key);
 Item *findItemVal(sHashTable *table, const char *v);
 int rmItem(sHashTable *table, const char *v);
-void error_alloc_exit(void);
+void errAllocExit(void);
 
 #endif

@@ -1,14 +1,19 @@
 /******************************************************************************
 Simple hash table
+
+How to handle Collisions?
+Separate Chaining
+
 *******************************************************************************/
 #include "hash.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 int main()
 {
-    /* all table */
-    sHashTable HashTable;
+
+    sHashTable HashTable; /* all table */
     Item *curr;
 
     printf("Hash table\n");
@@ -101,10 +106,10 @@ void initHashTable(sHashTable *table)
     table->cell = (Item **)malloc(table->size * sizeof(Item *));
 
     if (table->cell == NULL)
-        error_alloc_exit();
+        errAllocExit();
 
     for (size_t i = 0; i < table->size; i++)
-        table->cell[i] = NULL; // cell is emppty
+        table->cell[i] = NULL; /* NULL to all ceils */
 }
 
 /**
@@ -118,13 +123,32 @@ int hashFunc(const char *s)
     unsigned long c = 0;
 
     if (s == NULL)
-        return -1; // error
+        return ERR; /* error */
 
     for (; *s; s++)
         c += (unsigned long)(*s);
 
     return (c % HASH_SIZE);
 }
+
+/*
+Multiplication method
+h(key) = [ m * (key * A % 1) ]
+m - TABLE_SIZE
+
+int hashFunc(const char *s)
+{
+    double A = 0.61803398;
+    double res;
+    unsigned long c = 0;
+
+    for (; *s; s++)
+        c += (unsigned long)(*s);
+
+    double res = HASH_SIZE * fmod(c * A, 1);
+    return (int)res;
+}
+ */
 
 /**
  * @brief Insert value to Hash table
@@ -135,52 +159,59 @@ int hashFunc(const char *s)
 void insertItem(sHashTable *table, const char *data)
 {
     int key = hashFunc(data);
-    Item *item = createItem(table, data, key);
-    Item *curr_item;
+    Item *item = NULL;
+    Item *curr_item = NULL;
 
-    if (item == NULL)
-        error_alloc_exit();
+    if (table->cnt == table->size) /* no space in table */
+    {
+#ifdef DEBUG
+        printf("Warning, table is full\n");
+#endif
+        return;
+    }
 
     if (key < 0)
     {
-        printf("Error insert item\n");
+#ifdef DEBUG
+        printf("Error insert item(key error)\n");
+#endif
         exit(1);
     }
 
+    item = createItem(table, data, key); /* new item alloc */
+
+    if (item == NULL)
+        errAllocExit();
+
     if (table->cell[key] == NULL) /* no collision */
     {
-        if (table->cnt == table->size) /* no space in table */
-        {
-            printf("Warning, table is full\n");
-            free(item);
-            return;
-        }
-        /* 0K*/
         table->cell[key] = item; /* new data */
         table->cnt++;
-        printf("%s added in table\n", data);
+#ifdef DEBUG
+        printf("[%s] added in table\n", data);
+#endif
     }
-    else
+    else /* collision occur  */
     {
-        if (table->cell[key]->key == key) /* value == data */
+        if (strcmp(table->cell[key]->val, data) == 0) /* nothing to do */
+        {                                             //.. val = "Abc" data = "Abc" ; val = data
+#ifdef DEBUG
+            printf("[%s] = [%s] (skip)\n", table->cell[key]->val, data);
+#endif
+            return;
+        }
+        else /* collision */
         {
-            if (strcmp(table->cell[key]->val, data) == 0) /* nothing to do*/
-            {
-                printf("%s = %s\n", table->cell[key]->val, data);
-                return;
-            }
+            curr_item = table->cell[key];
 
-            else /* collision */
-            {
-                curr_item = table->cell[key];
+            while (curr_item->next != NULL)
+                curr_item = curr_item->next;
 
-                while (curr_item->next != NULL)
-                    curr_item = curr_item->next;
-
-                curr_item->next = item; /* new data */
-                table->cnt++;
-                printf("%s added in table(Collision)\n", data);
-            }
+            curr_item->next = item; /* new data */
+                                    // table->cnt++; We do not increase the counter, because the same cell
+#ifdef DEBUG
+            printf("[%s] added in table(Collision)\n", data);
+#endif
         }
     }
 }
@@ -197,19 +228,18 @@ Item *createItem(sHashTable *table, const char *data, const int key)
 {
     Item *new_item = (Item *)malloc(sizeof(Item));
 
-    if (data == NULL)
-        return NULL;
+    if (data == NULL)  return NULL;
 
-    if (new_item == NULL)
-        error_alloc_exit();
+    if (new_item == NULL) errAllocExit();
 
     new_item->val = (char *)malloc(strlen(data) + 1); /* alloc mem for string */
 
-    if (new_item->val == NULL)
-        error_alloc_exit();
+    if (new_item->val == NULL) errAllocExit();
 
     new_item->key = key;
     strcpy(new_item->val, data);
+
+    new_item->next = NULL;
 
     return new_item;
 }
@@ -228,7 +258,9 @@ Item *findItemVal(sHashTable *table, const char *v)
 
     if (key < 0)
     {
+#ifdef DEBUG
         printf("no input data\n");
+#endif
         return NULL;
     }
 
@@ -251,45 +283,75 @@ Item *findItemVal(sHashTable *table, const char *v)
  * @param table - ptr to table
  * @param v - rm value(C-string)
  * @return int - result OK/ERR
+ * TODO: 3 case -> 3 func
  */
 int rmItem(sHashTable *table, const char *v)
 {
     int key = hashFunc(v);
-    Item *curr_item = NULL, *temp = NULL, *prv;
+    Item *curr_item = NULL, *prv_item = NULL;
 
     if (key < 0)
     {
+#ifdef DEBUG
         printf("No input vaulue\n");
+#endif
         return ERR;
     }
 
     curr_item = table->cell[key];
 
-    if (curr_item == NULL) /* empty */
+    /* case 1: empty cell */
+    if (curr_item == NULL)
     {
-        printf("value : %s not in table\n", v);
+#ifdef DEBUG
+        printf("[value] : %s not in table\n", v);
+#endif
         return ERR; /* no delete */
     }
-    
+    /* case 1: end */
 
-    //** 3 case *//
-    //TODO
-    while (curr_item != NULL) /* finding */
+    /* case 2: curr_item != NULL only one item in cell */
+    if (curr_item->next == NULL)
     {
-        if (strcmp(v, curr_item->val) == 0)
+        if (strcmp(v, curr_item->val) == 0) /* if data match */
         {
-            temp = curr_item;
-            curr_item = curr_item->next;
-            free(temp);
-            table->cell[key] = curr_item;
-            return OK;
+            free(curr_item);
+            table->cell[key] = NULL;
+            table->cnt--;
+#ifdef DEBUG
+            printf("[value] : %s rm from table\n", v);
+#endif
         }
+        else
+        {
+#ifdef DEBUG
+            printf("[value] : %s not in table\n", v);
+#endif
+            return ERR; /* no delete */
+        }
+    }
+    /* case 2: end */
 
-        curr_item = curr_item->next;
+    /* case 3: cell with collision [*] -> val[key] -> val[key] */
+    prv_item = curr_item;
+    curr_item = curr_item->next;
+    if (strcmp(v, prv_item->val) == 0) // need rm head
+    {
+        table->cell[key] = curr_item;
+        free(prv_item);
+        table->cnt--;
+#ifdef DEBUG
+        printf("Head [value] : %s rm from table\n", v);
+#endif
+    }
+    else /* case 3: cell with collision [*] -> val[key] -> val[key]  but not head item */
+    {
+
     }
 
-    //prev_item->next = curr_item->next;
-    
+
+    // prev_item->next = curr_item->next;
+
     return 0;
 }
 
@@ -325,8 +387,10 @@ void freeTable(sHashTable *table)
  * @brief User function error
  *
  */
-void error_alloc_exit(void)
+void errAllocExit(void)
 {
+#ifdef DEBUG
     printf("Error alloc memory\n");
+#endif
     exit(1);
 }
