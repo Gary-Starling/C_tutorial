@@ -1,14 +1,12 @@
-/* Вывод числа в бинарном представлении */
 #include <stdio.h>
 
 void bit_show(int n);
 
 int main(int argc, char const *argv[])
 {
-
     int num = 0;
 
-    printf("Введите целое число, чтобы увидеть его бинарное представление\n");
+    printf("Enter int\n");
     scanf("%d", &num);
     bit_show(num);
     return 0;

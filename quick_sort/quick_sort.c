@@ -3,7 +3,7 @@
 #include <time.h>
 
 #define SIZE 10
-int a[SIZE]; //n - количество элементов
+int a[SIZE]; 
 
 void quick_sort(int *s_arr, int start, int end);
 

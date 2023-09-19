@@ -145,7 +145,8 @@ int main(int argc, char const *argv[])
     EnQueue(data2, &myQ);
     EnQueue(data3, &myQ);
     EnQueue(data4, &myQ);
-    DelQueue(&tmp,&myQ);
+    DelQueue(&tmp, &myQ);
+    DelQueue(&tmp, &myQ);
 
     while (myQ.cnt != 0)
     {
@@ -167,11 +168,6 @@ int main(int argc, char const *argv[])
     return 0;
 }
 
-//Прикол с указателем, на указатель QnextPtr = QueueNew *
-//т.е  QueueNew **head  QueueNew **tail
-//в основной программе объявлен указатель типа QnextPtr Head (QueueNew *Head)
-//чтобы в нём произошли изменения мы передаём адрес указателя на указатель
-//и уже в теле цикал происходит присваивание
 // void addQueue(QnextPtr *head, QnextPtr *tail, char in_data)
 // {
 //     QnextPtr newPtr;

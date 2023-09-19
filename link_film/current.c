@@ -90,3 +90,44 @@ void ItemShow(const List *ptrList)
     tmp = tmp->next;
   }
 }
+
+
+
+
+
+
+int main(int argc, char const *argv[])
+{
+  List LibMovies; //like a (Node *LibMovies)
+  propert tmp;
+
+  // Init
+  InitList(&LibMovies);
+
+  puts("Enter name film:");
+
+  while (gets(tmp.name) != NULL && tmp.name[0] != '\0')
+  {
+    puts("enter rating of film from <0 to 5>:");
+    scanf("%d", &tmp.rating);
+    while(getchar() != '\n');
+    if(AddItem(tmp, &LibMovies) != true)
+    {
+      puts("Error memory allocate");
+      exit(1);
+    }
+    else
+      puts("Enter name next film or emty string to exit");
+  }
+
+  if(ListIsEmpty(&LibMovies))
+  {
+    puts("No data");
+    exit(0);
+  }
+  else
+    ItemShow(&LibMovies);
+
+  CleanList(&LibMovies);  
+
+}

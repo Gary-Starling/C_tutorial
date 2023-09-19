@@ -14,14 +14,12 @@ struct listN *init(char a)
 {
     struct listN *lst;
 
-    //Выделим память
     lst = (struct listN *)malloc(sizeof(struct listN));
 
     if (lst != NULL)
     {
         lst->data = a;
-        lst->next = NULL; //Последний указатель списка
-
+        lst->next = NULL;
         return lst;
     }
     else
@@ -30,39 +28,35 @@ struct listN *init(char a)
 
 struct listN *addelem(struct listN *lst, char number)
 {
-
     struct listN *new, *temp;
-    new = (struct listN *)malloc(sizeof(struct listN)); //Выделим
-    temp = lst->next;   // сохранение указателя на следующий узел
-    lst->next = new;    // предыдущий узел привязали к новому
-    new->data = number; // сохранение поля данных добавляемого узла
-    new->next = temp;   // созданный узел указывает на следующий элемент
-    return (new);
+
+    new = (struct listN *)malloc(sizeof(struct listN));
+    temp = lst->next; // save ptr
+    lst->next = new;
+    new->data = number;
+    new->next = temp;
+    return new;
 }
 
 struct listN *deletelem(struct listN *lst, struct listN *root)
 {
-    struct listN *temp;
+    struct listN *temp = root;
 
-    temp = root;
+    while (temp->next != lst) /* look all litst*/
+        temp = temp->next;    /* until we find the node preceding lst */
 
-    while (temp->next != lst) // просматриваем список начиная с корня
-    {                         // пока не найдем узел, предшествующий lst
-        temp = temp->next;
-    }
-    temp->next = lst->next; // переставляем указатель
-    free(lst);              // освобождаем память удаляемого узла
+    temp->next = lst->next; /* let's rearrange */
+    free(lst);              /* free memory node*/
     return (temp);
 }
 
 void listprint(struct listN *lst)
 {
-    struct listN *p;
-    p = lst;
+    struct listN *p = lst;
     do
     {
-        printf("%c ", p->data); // вывод значения элемента p
-        p = p->next;            // переход к следующему узлу
+        printf("%c ", p->data); 
+        p = p->next;            
     } while (p != NULL);
 }
 
@@ -70,7 +64,7 @@ int main(int argc, char const *argv[])
 {
     struct listN *ptrlst = NULL;
 
-    StartPtr = init('a'); //Инит нашего списка
+    StartPtr = init('a');
     ptrlst = StartPtr;
     ptrlst = addelem(ptrlst, 'b');
     ptrlst = addelem(ptrlst, 'c');

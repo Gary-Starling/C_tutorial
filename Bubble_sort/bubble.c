@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
-/* Сортировка с указателем на функцию*/
-
-#define SIZE 20
-#define VALUE 100 /* заполняемое значение для rand */
+#define SIZE 10
+#define VALUE 50
 
 int sort_up(int a, int b);
 int sort_down(int a, int b);
@@ -16,12 +15,10 @@ void func1(void);
 void func2(void);
 void func3(void);
 
-
-
 int main(void)
 {
 
-    void (*fprint[3]) (void)= {func1, func2, func3};
+    void (*fprint[3])(void) = {func1, func2, func3};
 
     int array[SIZE] = {0};
     char symb;
@@ -33,7 +30,7 @@ int main(void)
 
     for (size_t i = 0; i < (sizeof(array) / sizeof(int)); i++)
     {
-        /* Заполним массив случайными числами */
+        /* Random */
         array[i] = rand() % VALUE;
         printf("a[%d] = %4d   ", i, array[i]);
 
@@ -50,49 +47,37 @@ enter key....\n\n");
 
     printf("\n");
 
-    if (symb == 'U' || symb == 'u')
+    switch (symb)
     {
+    case 'U':
+    case 'u':
         regim = 0;
         (*fprint[regim])();
-    }
-    else if (symb == 'D' || symb == 'd')
-    {
-        regim = 1;
-        (*fprint[regim])();
-    }
-    else
-    {
-        regim = 2;
-        (*fprint[regim])();
-    }
-
-    switch (regim)
-    {
-
-    case 0:
         buble(array, sort_up, SIZE);
         print_sort(SIZE, array);
         break;
 
-    case 1:
+    case 'D':
+    case 'd':
+        regim = 1;
+        (*fprint[regim])();
         buble(array, sort_down, SIZE);
         print_sort(SIZE, array);
         break;
 
     default:
+        regim = 2;
+        (*fprint[regim])();
         printf("nithing to do.");
         break;
     }
-
-    return 0;
 }
 
 void buble(int *array, int (*compare)(int a, int b), int size)
 {
     for (size_t d = 0; d <= (size - 1); d++)
     {
-
-        for (size_t j = 0; j <= (size - 2); j++) //Это один проход
+        for (size_t j = 0; j <= (size - 2); j++) // Это один проход
         {
             if ((*compare)(array[j], array[j + 1]))
                 swap(&array[j], &array[j + 1]);
@@ -118,7 +103,7 @@ int sort_down(int a, int b)
 
 void swap(int *elmnt1, int *elmnt2)
 {
-    int temp; //Промежуточная переменная для хранения
+    int temp;
 
     temp = *elmnt1;
     *elmnt1 = *elmnt2;
@@ -129,9 +114,7 @@ void print_sort(int size, int *array)
 {
     for (size_t f = 0; f < size; f++)
     {
-        /*сортированнный массив */
         printf("a[%d] = %4d   ", f, array[f]);
-
         if ((f % 5 == 0) && (f != 0))
             printf("\n");
     }

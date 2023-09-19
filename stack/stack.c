@@ -26,7 +26,7 @@ int main(int argc, char const *argv[])
     printf("delete item %d: in stack\n", pop(&StacktPtr));
     printf("delete item %d: in stack\n", pop(&StacktPtr));
     print_stack(StacktPtr);
-    //Доделать pop
+    // Доделать pop
     return 0;
 }
 
@@ -53,7 +53,7 @@ void print_stack(STACKNODE *topPtr)
     int * a = &c;
     int * b = &d;
     int * f = &e;
-    int ** pp = &a; 
+    int ** pp = &a;
 
      a = b;
     //Тут значение указателя изменится, но только внутри функции
@@ -70,17 +70,16 @@ void change(int ** x, int * z){
 }
 */
 
-
 int push(STACKNODE **topPtr, int info)
 {
     STACKNODE *newPtr;
 
-    newPtr = malloc(sizeof(STACKNODE)); //Выделим память
+    newPtr = malloc(sizeof(STACKNODE)); // Выделим память
 
     if (newPtr != NULL)
     {
-        newPtr->data = info;       //Втолкнём значения в нашу структуру
-        newPtr->nextptr = *topPtr; //Теперь элемент который получили свяжем с верхом стопки
+        newPtr->data = info;       // Втолкнём значения в нашу структуру
+        newPtr->nextptr = *topPtr; // Теперь элемент который получили свяжем с верхом стопки
         *topPtr = newPtr;          // Верхний элемент это наш новый элемент
     }
     else
