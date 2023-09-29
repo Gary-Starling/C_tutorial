@@ -39,6 +39,8 @@ int main()
     insertItem(&HashTable, "Richard");
     insertItem(&HashTable, "Drahcir");
     insertItem(&HashTable, "Darhcir");
+    
+    /* test case 1 add collision 5 */
     printf("\n");
 
     printf("Search\n");
@@ -208,7 +210,7 @@ void insertItem(sHashTable *table, const char *data)
                 curr_item = curr_item->next;
 
             curr_item->next = item; /* new data */
-                                    // table->cnt++; We do not increase the counter, because the same cell
+            table->cnt++;
 #ifdef DEBUG
             printf("[%s] added in table(Collision)\n", data);
 #endif
@@ -228,13 +230,16 @@ Item *createItem(sHashTable *table, const char *data, const int key)
 {
     Item *new_item = (Item *)malloc(sizeof(Item));
 
-    if (data == NULL)  return NULL;
+    if (data == NULL)
+        return NULL;
 
-    if (new_item == NULL) errAllocExit();
+    if (new_item == NULL)
+        errAllocExit();
 
     new_item->val = (char *)malloc(strlen(data) + 1); /* alloc mem for string */
 
-    if (new_item->val == NULL) errAllocExit();
+    if (new_item->val == NULL)
+        errAllocExit();
 
     new_item->key = key;
     strcpy(new_item->val, data);
@@ -288,9 +293,18 @@ Item *findItemVal(sHashTable *table, const char *v)
 int rmItem(sHashTable *table, const char *v)
 {
     int key = hashFunc(v);
-    Item *curr_item = NULL, *prv_item = NULL;
+    Item *curr_item, *temp = NULL, *prev = NULL;
+    curr_item = table->cell[key];
 
-    if (key < 0)
+    if (table->cnt == 0)
+    {
+#ifdef DEBUG
+        printf("Table is empty\n");
+#endif
+        return ERR;
+    }
+
+    if (key < 0) /* Error key */
     {
 #ifdef DEBUG
         printf("No input vaulue\n");
@@ -298,61 +312,51 @@ int rmItem(sHashTable *table, const char *v)
         return ERR;
     }
 
-    curr_item = table->cell[key];
-
-    /* case 1: empty cell */
-    if (curr_item == NULL)
+    if (curr_item == NULL) /* case 1: empty cell (nothing to do) */
     {
 #ifdef DEBUG
         printf("[value] : %s not in table\n", v);
 #endif
-        return ERR; /* no delete */
+        return ERR;
     }
     /* case 1: end */
 
-    /* case 2: curr_item != NULL only one item in cell */
-    if (curr_item->next == NULL)
+    if (strcmp(v, curr_item->val) == 0) /* if data match (head value) */
     {
-        if (strcmp(v, curr_item->val) == 0) /* if data match */
-        {
-            free(curr_item);
-            table->cell[key] = NULL;
-            table->cnt--;
-#ifdef DEBUG
-            printf("[value] : %s rm from table\n", v);
-#endif
-        }
-        else
-        {
-#ifdef DEBUG
-            printf("[value] : %s not in table\n", v);
-#endif
-            return ERR; /* no delete */
-        }
-    }
-    /* case 2: end */
-
-    /* case 3: cell with collision [*] -> val[key] -> val[key] */
-    prv_item = curr_item;
-    curr_item = curr_item->next;
-    if (strcmp(v, prv_item->val) == 0) // need rm head
-    {
-        table->cell[key] = curr_item;
-        free(prv_item);
         table->cnt--;
-#ifdef DEBUG
-        printf("Head [value] : %s rm from table\n", v);
-#endif
+        temp = curr_item;
+        curr_item = curr_item->next; /* next data or NULL */
+        table->cell[key] = curr_item;
+        free(temp);
+        printf("[value] : %s rm from table\n", v);
+        return OK;
     }
-    else /* case 3: cell with collision [*] -> val[key] -> val[key]  but not head item */
+    else /* collision */
     {
+        prev = curr_item;
+        curr_item = curr_item->next;
 
+        while (curr_item != NULL)
+        {
+            if (strcmp(v, curr_item->val) == 0)
+            {
+                table->cnt--;
+                temp = curr_item;
+                prev->next = curr_item->next;
+                free(temp);
+                printf("[value] : %s rm from table\n", v);
+                return OK;
+            }
+
+            prev = curr_item;
+            curr_item = curr_item->next;
+        }
     }
 
-
-    // prev_item->next = curr_item->next;
-
-    return 0;
+#ifdef DEBUG
+    printf("[value] : %s not in table\n", v);
+#endif
+    return ERR;
 }
 
 /**
