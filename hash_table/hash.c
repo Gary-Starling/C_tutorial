@@ -9,12 +9,17 @@ Separate Chaining
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
 int main()
 {
-
+    time_t start, end;
     sHashTable HashTable; /* all table */
     Item *curr;
+    char s[10];
+
+    start = clock();
+    srand(time(NULL));
 
     printf("Hash table\n");
 
@@ -35,12 +40,12 @@ int main()
     insertItem(&HashTable, "Igor");
     insertItem(&HashTable, "rogI");
     insertItem(&HashTable, "Saladin");
+    /* test case 1 add collision */
     insertItem(&HashTable, "Richard");
     insertItem(&HashTable, "Richard");
     insertItem(&HashTable, "Drahcir");
     insertItem(&HashTable, "Darhcir");
-    
-    /* test case 1 add collision 5 */
+
     printf("\n");
 
     printf("Search\n");
@@ -90,8 +95,49 @@ int main()
         }
     }
 
+    printf("*************\n\n\r");
+    insertItem(&HashTable, "Abc");
+    curr = findItemVal(&HashTable, "Abc");
+    printf("value : %s, key[%d]\n", curr->val, curr->key);
+    rmItem(&HashTable, "Abc"); // rm head
+
+    insertItem(&HashTable, "Acb");
+    curr = findItemVal(&HashTable, "Acb");
+    printf("value : %s, key[%d]\n", curr->val, curr->key);
+    // rmItem(&HashTable, "Acb"); //rm item list []->[x]->[]->[]
+    //                          //                |________^
+
+    insertItem(&HashTable, "cAb");
+    curr = findItemVal(&HashTable, "cAb");
+    printf("value : %s, key[%d]\n", curr->val, curr->key);
+    // rmItem(&HashTable, "cAb");// rm item list []->[]->[x]->[]
+    //                           //                   |________^
+
+    insertItem(&HashTable, "cbA");
+    curr = findItemVal(&HashTable, "cbA");
+    printf("value : %s, key[%d]\n", curr->val, curr->key);
+    // rmItem(&HashTable, "Acbd"); rm in the end of list []->[]->[]->[x]
+    printf("*************\n\n\r");
+
+    /* random test */
+    for (unsigned int i = 0; i < HASH_SIZE; i++)
+    {
+        randString10(s);
+        insertItem(&HashTable, s);
+    }
+
+    for (unsigned int i = 0; i < HASH_SIZE; i++)
+    {
+        randString10(s);
+        rmItem(&HashTable, s);
+    }
+
+    printTable(&HashTable);
     freeTable(&HashTable);
     printf("OK\n");
+    end = clock();
+
+    printf("Total time:%g\n", (double)(end - start) / CLOCKS_PER_SEC);
 
     return 0;
 }
@@ -190,7 +236,7 @@ void insertItem(sHashTable *table, const char *data)
         table->cell[key] = item; /* new data */
         table->cnt++;
 #ifdef DEBUG
-        printf("[%s] added in table\n", data);
+        printf("[%s] added in table; key[%d]\n", data, key);
 #endif
     }
     else /* collision occur  */
@@ -207,12 +253,21 @@ void insertItem(sHashTable *table, const char *data)
             curr_item = table->cell[key];
 
             while (curr_item->next != NULL)
+            {
                 curr_item = curr_item->next;
+                if (strcmp(curr_item->val, data) == 0) /* nothing to do */
+                {                                      //.. val = "Abc" data = "Abc" ; val = data
+#ifdef DEBUG
+                    printf("[%s] = [%s] (skip)\n", curr_item->val, data);
+#endif
+                    return;
+                }
+            }
 
             curr_item->next = item; /* new data */
             table->cnt++;
 #ifdef DEBUG
-            printf("[%s] added in table(Collision)\n", data);
+            printf("[%s] added in table(Collision); key[%d]\n", data, key);
 #endif
         }
     }
@@ -397,4 +452,39 @@ void errAllocExit(void)
     printf("Error alloc memory\n");
 #endif
     exit(1);
+}
+
+/**
+ * @brief
+ *
+ * @param table
+ */
+void printTable(const sHashTable *const table)
+{
+    Item *curr;
+
+    /* printall */
+    for (unsigned int i = 0; i < HASH_SIZE - 1; i++)
+    {
+        curr = table->cell[i];
+        while (curr != NULL)
+        {
+#ifdef DEBUG
+            printf("value : %s, key[%d]\n", curr->val, curr->key);
+#endif
+            curr = curr->next;
+        }
+    }
+}
+
+void randString10(char *s)
+{
+    int i;
+    int len = 1 + rand() % 9;
+    for (i = 0; i < len; ++i)
+    {
+        s[i] = rand() % 26 + 'A';
+        len = 1 + rand() % 9;
+    }
+    s[len] = '\0';
 }

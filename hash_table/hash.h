@@ -50,5 +50,7 @@ Item *createItem(sHashTable *table, const char *data, const int key);
 Item *findItemVal(sHashTable *table, const char *v);
 int rmItem(sHashTable *table, const char *v);
 void errAllocExit(void);
+void printTable(const sHashTable * const table);
+void randString10(char * s);
 
 #endif
