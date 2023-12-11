@@ -1,2 +1,2 @@
-# algorithms and training on C
+# algorithms and training
 #
