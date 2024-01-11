@@ -1,9 +1,17 @@
 #include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+
+#define _PRINT_OUT_ NO
+#define _NO_ 0
+#define _YES_ 1
+#define N (102400U)     
+
+// result on my PC Sorting time 7.3140 sec
 
 void arr_print(int *arr, unsigned int len);
 
-int arr[] = {4, 1, 8, 2, 9, 7, 2, 12};
-// sort
+// sort example
 //                ^
 //            {4, 1, 8, 2, 9}}
 //                     ^
@@ -16,11 +24,25 @@ int arr[] = {4, 1, 8, 2, 9, 7, 2, 12};
 //     i=4    {[1, 2, 4, 8, 9]}
 int main(int argc, char const *argv[])
 {
+    int arr[N];
+    unsigned int len = (sizeof(arr) / sizeof(int));
     int tmp;
+    double st, end;
 
-    arr_print(arr,  sizeof(arr) / sizeof(arr[0]));
+    srand(time(NULL));
 
-    for (unsigned int i = 1; i < sizeof(arr) / sizeof(arr[0]); i++)
+    /* fill array */
+    for (unsigned int i = 0; i < len; i++)
+        arr[i] = rand() % len;
+
+#if _PRINT_OUT_ == _YES_
+    printf("\nUnsorted\n");
+    arr_print(arr, len);
+#endif
+
+    st = clock();
+
+    for (unsigned int i = 1; i < len; i++)
     {
         for (unsigned int j = i; j != 0; j--)
         {
@@ -35,13 +57,17 @@ int main(int argc, char const *argv[])
         }
     }
 
-     arr_print(arr,  sizeof(arr) / sizeof(arr[0]));
+    end = clock();
+
+#if _PRINT_OUT_ == _YES_
+    printf("\nSorted\n");
+    arr_print(arr, len);
+#endif
+
+    printf("Sorting time %.4lf sec.\n", (double)((end - st) / CLK_TCK));
 
     return 0;
 }
-
-
-
 
 /**
  * @brief Print all elements of array

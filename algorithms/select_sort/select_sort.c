@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
-#include <time.h>
 
 #define _PRINT_OUT_ _NO_
 #define _NO_ 0
 #define _YES_ 1
 #define N (102400U)
+
+//result on my PC Sorting time 12.6700 sec.
 
 int minf(int *a, unsigned int offset, unsigned int len);
 void arr_print(int *arr, unsigned int len);
@@ -25,8 +26,9 @@ int main(void)
     for (unsigned int i = 0; i < len; i++)
         arr[i] = rand() % len;
 
-    printf("\nUnsorted\n");
+
 #if _PRINT_OUT_ == _YES_
+    printf("\nUnsorted\n");
     arr_print(arr, len);
 #endif
     st = clock();
@@ -44,8 +46,9 @@ int main(void)
     }
 
     end = clock();
-    printf("\nSorted\n");
+
 #if _PRINT_OUT_ == _YES_
+    printf("\nSorted\n");
     arr_print(arr, len);
 #endif
 
