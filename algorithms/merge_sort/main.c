@@ -5,8 +5,8 @@
 #include <time.h>
 #include <stdlib.h>
 
-#define _SIZE_IN (7)
-#define _SIZE_OUT (7)
+#define _SIZE_IN (100)
+#define _SIZE_OUT (100)
 typedef int data;
 
 #define _PRINT_OUT_ _YES_
