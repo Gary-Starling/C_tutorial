@@ -1,12 +1,13 @@
-/* Type your code here, or load an example. */
 /* exrecise for string aka linked list
-[h]->[e]->[y]->[_]->[a]->[l]->[l]
-need swap words in string///*/
+[h]->[e]->[y]->[_]->[a]->[l]->[l]-[_]
+1)need swap words in string
+2)all words end ' '
+3)make program */
 #include <stdio.h>
 #include <stdlib.h>
 
 //
-typedef struct
+typedef struct Item
 {
     int data;
     struct Item *next;
@@ -25,21 +26,31 @@ sList *list_new(void);
 void list_delete(sList **list);
 void item_insert_back(sList **list, char data);
 void item_insert_top(sList **list, char data);
-/* */
-int list_len(sList *list);
-void list_print(sList *list);
-/**/
-void error_exit(void);
 
-//
+/* */
+int list_len(sList **list);
+void list_print(sList **list);
+
+/**/
+void error_exit(const char *s);
+
+/**/
+void swap_word(sList **list, sItem *l1, sItem *l2);
+
+/**
+ * @brief
+ *
+ * @return sList*
+ */
 sList *list_new(void)
 {
     sList *list = malloc(sizeof(sList));
 
-    if(list == NULL) return  NULL;
+    if (list == NULL)
+        return NULL;
 
     list->head = NULL;
-    list->head = NULL;
+    list->tail = NULL;
 
     char check = getchar();
 
@@ -49,21 +60,28 @@ sList *list_new(void)
         check = getchar();
     }
 
+    item_insert_back(&list, 10);
     return list;
 }
 
-//
+/**
+ * @brief
+ *
+ * @param list
+ * @param data
+ */
 void item_insert_back(sList **list, char data)
 {
     sItem *new = item_create(data);
     sItem *tmp = (*list)->head;
 
-    if (new == NULL) exit(1);
+    if (new == NULL)
+        error_exit("Error alloc");
 
     if (tmp == NULL)
     {
-        list->head = new;
-        list->tail = new;
+        (*list)->head = new;
+        (*list)->tail = new;
     }
     else
     {
@@ -74,39 +92,54 @@ void item_insert_back(sList **list, char data)
     }
 }
 
-//
-void item_insert_top(List *list, char data)
+/**
+ * @brief
+ *
+ * @param list
+ * @param data
+ */
+void item_insert_top(sList **list, char data)
 {
-    Item *new = item_create(data);
+    sItem *new = item_create(data);
 
     if (new == NULL)
-        exit(1);
+        error_exit("Error alloc");
 
-    if (list->head == NULL)
+    if ((*list)->head == NULL)
     {
-        list->head = new;
-        list->tail = new;
+        (*list)->head = new;
+        (*list)->tail = new;
     }
     else
     {
-        new->next = list->head;
-        list->head = new;
+        new->next = (*list)->head;
+        (*list)->head = new;
     }
 }
 
-Item *item_create(int data)
+/**
+ * @brief
+ *
+ * @param data
+ * @return sItem*
+ */
+sItem *item_create(int data)
 {
-    Item *tmp = (Item *)malloc(sizeof(Item));
+    sItem *tmp = malloc(sizeof(sItem));
     tmp->data = data;
     tmp->next = NULL;
     return tmp;
 }
 
-//
-void list_delete(List **list)
+/**
+ * @brief
+ *
+ * @param list
+ */
+void list_delete(sList **list)
 {
-    Item *ptr = (*list)->head;
-    Item *tmp;
+    sItem *ptr = (*list)->head;
+    sItem *tmp;
 
     while (ptr != NULL)
     {
@@ -119,10 +152,14 @@ void list_delete(List **list)
     *list = NULL;
 }
 
-//
-void list_print(List *list)
+/**
+ * @brief
+ *
+ * @param list
+ */
+void list_print(sList **list)
 {
-    Item *tmp = list->head;
+    sItem *tmp = (*list)->head;
 
     while (tmp)
     {
@@ -134,16 +171,15 @@ void list_print(List *list)
 }
 
 //
-int list_len(List *list)
+int list_len(sList **list)
 {
-    Item *ptr;
+    sItem *ptr = NULL;
     unsigned int len = 0;
 
-    if (list == NULL)
+    if (*list == NULL)
         return 0;
 
-    ptr = list->head;
-
+    ptr = (*list)->head;
     while (ptr != NULL)
     {
         len++;
@@ -154,29 +190,29 @@ int list_len(List *list)
 }
 
 //
-void swap_word(List *list, Item *l, Item *r)
+void swap_word(sList **list, sItem *l1, sItem *l2)
 {
-    Item *prL, *nextl, *prR, *nextR;
+    sItem *prL, *nextl, *prR, *nextR;
 
-    prL = list->head;
-    prR = list->head;
+    prL = (*list)->head;
+    prR = (*list)->head;
 
-    if (prL == l)
+    if (prL == l1)
         prL = NULL; // no item prev left
-    while (prL->next != l)
+    while (prL->next != l1)
         prL = prL->next; // prev
-    nextl = l->next;     // next
+    nextl = l1->next;     // next
 
-    if (prR = r)
+    if (prR = l2)
         prR = NULL;
-    while (prR->next != r)
+    while (prR->next != l2)
         prR = prR->next;
-    nextR = r->next;
+    nextR = l2->next;
 
-    if (nextl == r) //
+    if (nextl == l2) //
     {
     }
-    else if (nextR == l)
+    else if (nextR == l2)
     {
     }
     else
@@ -184,15 +220,18 @@ void swap_word(List *list, Item *l, Item *r)
     }
 }
 
+void error_exit(const char *msg)
+{
+    printf("%s\n");
+    exit(1);
+}
+
 int main()
 {
     sList *list = list_new();
 
-    if(list == NULL)
-    {
-        printf("Error memory alloc\n");
-        exit(1);
-    }
+    if (list == NULL)
+        error_exit("Error alloc");
 
     while (list)
     {
@@ -201,10 +240,10 @@ int main()
         // item_insert_top(list, 'a');
         //  list_print(list);
         //  list_sort(list);
-        list_print(list);
-        printf("list len ->%d\n", list_len(list));
+        list_print(&list);
+        printf("list len ->%d\n", list_len(&list));
         list_delete(&list);
-        printf("list len ->%d\n", list_len(list));
+        printf("list len ->%d\n", list_len(&list));
         list = list_new();
     }
 
