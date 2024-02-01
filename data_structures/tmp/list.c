@@ -1,8 +1,13 @@
-/* exrecise for string aka linked list
+/*
+exrecise for string aka linked list
 [h]->[e]->[y]->[_]->[a]->[l]->[l]-[_]
-1)need swap words in string
-2)all words end ' '
-3)make program */
+* Words in a line are not repeated
+*all words end ' ' !!!
+
+Need swap words in string
+  Input:  [H][e][l][l][o][_][W][o][r][l][d][_]
+  Output: [W][o][r][l][d][_][H][e][l][l][o][_]
+*/
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -24,7 +29,7 @@ typedef struct
 sItem *item_create(int data);
 sList *list_new(void);
 void list_delete(sList **list);
-void item_insert_back(sList **list, char data);
+sItem *item_insert_back(sList **list, char data);
 void item_insert_top(sList **list, char data);
 
 /* */
@@ -42,9 +47,14 @@ void swap_word(sList **list, sItem *l1, sItem *l2);
  *
  * @return sList*
  */
+// Test
+sItem *arr[100] = {NULL}; // for test
+unsigned int step = 0;    // for fast test swap
 sList *list_new(void)
 {
     sList *list = malloc(sizeof(sList));
+
+    printf("Enter the words on one line separated by spaces. There is no need to enter the last space\n");
 
     if (list == NULL)
         return NULL;
@@ -56,11 +66,11 @@ sList *list_new(void)
 
     while (check != '\n')
     {
-        item_insert_back(&list, check);
+        arr[step++] = item_insert_back(&list, check);
         check = getchar();
     }
 
-    item_insert_back(&list, 10);
+    arr[step++] = item_insert_back(&list, 10);
     return list;
 }
 
@@ -69,8 +79,9 @@ sList *list_new(void)
  *
  * @param list
  * @param data
+ * @return sItem*
  */
-void item_insert_back(sList **list, char data)
+sItem *item_insert_back(sList **list, char data)
 {
     sItem *new = item_create(data);
     sItem *tmp = (*list)->head;
@@ -90,6 +101,8 @@ void item_insert_back(sList **list, char data)
 
         tmp->next = new;
     }
+
+    return new;
 }
 
 /**
@@ -192,42 +205,133 @@ int list_len(sList **list)
 //
 void swap_word(sList **list, sItem *l1, sItem *l2)
 {
-    sItem *prL, *nextl, *prR, *nextR;
+    sItem *prl1, *nextl1, *prl2, *nextl2; //  [pr] [l1] [next]
+    sItem *l1e, *l2e;                     // end word  [pr] [l1 data = H]... [l1e data=o] [l1e]] -> word "Hello_"
 
-    prL = (*list)->head;
-    prR = (*list)->head;
-
-    if (prL == l1)
-        prL = NULL; // no item prev left
-    while (prL->next != l1)
-        prL = prL->next; // prev
-    nextl = l1->next;     // next
-
-    if (prR = l2)
-        prR = NULL;
-    while (prR->next != l2)
-        prR = prR->next;
-    nextR = l2->next;
-
-    if (nextl == l2) //
+    if ((l1 == NULL) || (l2 == NULL))
     {
+        printf("adr1 -> %x; adr2 -> %x;\n", l1, l2);
+        return;
     }
-    else if (nextR == l2)
+
+    if ((*list) == NULL)
     {
+        printf("list is empty\n");
+        return;
     }
+
+    prl1 = (*list)->head;
+    prl2 = (*list)->head;
+
+    // TODO:** next two steps must be pack in function
+    /* for l1 find start*/
+    if (prl1 == l1)
+        prl1 = NULL; // no item prev<-l1
     else
     {
+        while (prl1->next != l1) // find prv
+            prl1 = prl1->next;   // next ptr
     }
+    nextl1 = l1->next; // next for l1
+    /* for l1 find end */
+    l1e = nextl1;
+    while (l1e->data != ' ')
+        l1e = l1e->next;
+
+    /* for l2 */
+    // TODO:**
+    if (prl2 == l2)
+        prl2 = NULL; // same opertions for l2
+    else
+    {
+        while (prl2->next != l2)
+            prl2 = prl2->next;
+    }
+    nextl2 = l2->next;
+    /* for l1 find end */
+    l2e = nextl2;
+    while (l2e->data != ' ')
+        l2e = l2e->next;
+
+    /* swap */
+    prl1->next = l2;
+    l2e->next = nextl1;
+    prl2->next = l1;
+    l1e->next = nextl2;
 }
 
+/**
+ * @brief
+ *
+ * @param msg
+ */
 void error_exit(const char *msg)
 {
     printf("%s\n");
     exit(1);
 }
 
+/**
+ * @brief
+ *
+ * @param list
+ * @param word
+ */
+sItem *find_start_word(sList **list, const char *word, size_t len)
+{
+    sItem *tmp, *res = (*list)->head;
+    char *p = word;
+    size_t len_check = 0;
+
+    if (tmp == NULL)
+    {
+        printf("list is empty\n");
+        return NULL;
+    }
+
+    if (p == NULL)
+    {
+        printf("word is empty\n");
+        return NULL;
+    }
+
+    /*
+    char *
+strstr (const char *s1, const char *s2)
+{
+  const char *p = s1;
+  const size_t len = strlen (s2);
+
+  if (!len)
+    return s1;
+
+  for (; (p = strchr (p, *s2)) != 0; p++)
+    {
+      if (strncmp (p, s2, len) == 0)
+    return (char *)p;
+    }
+  return (0);
+}*/
+
+    /* Find the start word(letter) */
+    // while(p && tmp)
+    // {
+    //     if(*p++ == tmp->data)
+    //     {
+    //         while (*p !=)
+    //         {
+    //             /* code */
+    //         }
+
+    //     }
+    // }
+
+    // if(len_check == len) return ok;
+}
+
 int main()
 {
+    //Hey_all_ TEST 
     sList *list = list_new();
 
     if (list == NULL)
@@ -238,8 +342,9 @@ int main()
         // item_insert_top(list, 'c');
         // item_insert_top(list, 'b');
         // item_insert_top(list, 'a');
-        //  list_print(list);
-        //  list_sort(list);
+
+        list_print(&list);
+        swap_word(&list, arr[0], arr[4]);
         list_print(&list);
         printf("list len ->%d\n", list_len(&list));
         list_delete(&list);
