@@ -10,11 +10,12 @@ Need swap words in string
 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 //
 typedef struct Item
 {
-    int data;
+    char data;
     struct Item *next;
 } sItem;
 
@@ -31,6 +32,7 @@ sList *list_new(void);
 void list_delete(sList **list);
 sItem *item_insert_back(sList **list, char data);
 void item_insert_top(sList **list, char data);
+sItem *find_start_word(sList **list, const char *word, size_t len);
 
 /* */
 int list_len(sList **list);
@@ -48,8 +50,6 @@ void swap_word(sList **list, sItem *l1, sItem *l2);
  * @return sList*
  */
 // Test
-sItem *arr[100] = {NULL}; // for test
-unsigned int step = 0;    // for fast test swap
 sList *list_new(void)
 {
     sList *list = malloc(sizeof(sList));
@@ -66,11 +66,11 @@ sList *list_new(void)
 
     while (check != '\n')
     {
-        arr[step++] = item_insert_back(&list, check);
+        item_insert_back(&list, check);
         check = getchar();
     }
 
-    arr[step++] = item_insert_back(&list, 10);
+    item_insert_back(&list, 32);
     return list;
 }
 
@@ -232,11 +232,11 @@ void swap_word(sList **list, sItem *l1, sItem *l2)
         while (prl1->next != l1) // find prv
             prl1 = prl1->next;   // next ptr
     }
-    nextl1 = l1->next; // next for l1
     /* for l1 find end */
-    l1e = nextl1;
+    l1e = l1;
     while (l1e->data != ' ')
         l1e = l1e->next;
+    nextl1 = l1e;
 
     /* for l2 */
     // TODO:**
@@ -247,16 +247,20 @@ void swap_word(sList **list, sItem *l1, sItem *l2)
         while (prl2->next != l2)
             prl2 = prl2->next;
     }
-    nextl2 = l2->next;
+    // nextl2 = l2->next;
     /* for l1 find end */
-    l2e = nextl2;
+    l2e = l2;
     while (l2e->data != ' ')
         l2e = l2e->next;
+    nextl2 = l2e->next;
 
     /* swap */
-    prl1->next = l2;
+    if (prl1 != NULL) prl1->next = l2;
+
     l2e->next = nextl1;
-    prl2->next = l1;
+
+    if (prl2 != NULL) prl2->next = l1;
+
     l1e->next = nextl2;
 }
 
@@ -279,8 +283,9 @@ void error_exit(const char *msg)
  */
 sItem *find_start_word(sList **list, const char *word, size_t len)
 {
-    sItem *tmp, *res = (*list)->head;
-    char *p = word;
+    sItem *tmp = (*list)->head;
+    sItem *res = NULL;
+    const char *p = word;
     size_t len_check = 0;
 
     if (tmp == NULL)
@@ -295,44 +300,34 @@ sItem *find_start_word(sList **list, const char *word, size_t len)
         return NULL;
     }
 
-    /*
-    char *
-strstr (const char *s1, const char *s2)
-{
-  const char *p = s1;
-  const size_t len = strlen (s2);
-
-  if (!len)
-    return s1;
-
-  for (; (p = strchr (p, *s2)) != 0; p++)
-    {
-      if (strncmp (p, s2, len) == 0)
-    return (char *)p;
-    }
-  return (0);
-}*/
-
     /* Find the start word(letter) */
-    // while(p && tmp)
-    // {
-    //     if(*p++ == tmp->data)
-    //     {
-    //         while (*p !=)
-    //         {
-    //             /* code */
-    //         }
+    while (p && tmp)
+    {
+        if (*p++ == tmp->data)
+        {
+            if (!res)
+                res = tmp;
+            len_check++;
+        }
+        else
+        {
+            p = word;
+            len_check = 0;
+        }
+        tmp = tmp->next;
 
-    //     }
-    // }
+        if (len == len_check)
+            return res;
+    }
 
-    // if(len_check == len) return ok;
+    return NULL;
 }
 
 int main()
 {
-    //Hey_all_ TEST 
+    // Hey_all_ TEST string
     sList *list = list_new();
+    sItem *f1 = NULL, *f2 = NULL;
 
     if (list == NULL)
         error_exit("Error alloc");
@@ -344,7 +339,9 @@ int main()
         // item_insert_top(list, 'a');
 
         list_print(&list);
-        swap_word(&list, arr[0], arr[4]);
+        f1 = find_start_word(&list, "hey", strlen("hey"));
+        f2 = find_start_word(&list, "all", strlen("all"));
+        swap_word(&list, f1, f2);
         list_print(&list);
         printf("list len ->%d\n", list_len(&list));
         list_delete(&list);
