@@ -12,6 +12,7 @@ typedef int data;
 #define N (102400U)
 
 //result on my PC Sorting time 0.0160 sec
+//alloc time?
 
 void mergeSort(data *arrIn, data *arrOut, unsigned int start, unsigned int end);
 void merge(data *arrIn, data *arrOut, unsigned int start, unsigned int end);

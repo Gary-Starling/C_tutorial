@@ -204,8 +204,8 @@ int list_len(sList **list)
 
 //
 void swap_word(sList **list, sItem *l1, sItem *l2)
-{
-    sItem *prl1, *nextl1, *prl2, *nextl2; //  [pr] [l1] [next]
+{                                         //
+    sItem *prl1, *nextl1, *prl2, *nextl2; // [prl1] [l1] [l1e] ;;;; [prl2] [l2] [l2e]
     sItem *l1e, *l2e;                     // end word  [pr] [l1 data = H]... [l1e data=o] [l1e]] -> word "Hello_"
 
     if ((l1 == NULL) || (l2 == NULL))
@@ -225,9 +225,7 @@ void swap_word(sList **list, sItem *l1, sItem *l2)
 
     // TODO:** next two steps must be pack in function
     /* for l1 find start*/
-    if (prl1 == l1)
-        prl1 = NULL; // no item prev<-l1
-    else
+    if (prl1 != l1)
     {
         while (prl1->next != l1) // find prv
             prl1 = prl1->next;   // next ptr
@@ -236,13 +234,11 @@ void swap_word(sList **list, sItem *l1, sItem *l2)
     l1e = l1;
     while (l1e->data != ' ')
         l1e = l1e->next;
-    nextl1 = l1e;
+    nextl1 = l1e->next;
 
     /* for l2 */
     // TODO:**
-    if (prl2 == l2)
-        prl2 = NULL; // same opertions for l2
-    else
+    if (prl2 != l2)
     {
         while (prl2->next != l2)
             prl2 = prl2->next;
@@ -254,14 +250,43 @@ void swap_word(sList **list, sItem *l1, sItem *l2)
         l2e = l2e->next;
     nextl2 = l2e->next;
 
-    /* swap */
-    if (prl1 != NULL) prl1->next = l2;
+    if (nextl1 == l2) /* swap near (word1) -> (word2) */
+    {
+        if ((*list)->head == l1)
+            (*list)->head = l2;
+        else
+            prl1->next = l2;
 
-    l2e->next = nextl1;
+        l2e->next = l1;
+        l1e->next = nextl2;
+    }
+    else if (nextl2 == l1) /* swap near (word2) -> (word1) */
+    {
+        if ((*list)->head == l2)
+            (*list)->head = l1;
+        else
+            prl2->next = l1;
 
-    if (prl2 != NULL) prl2->next = l1;
+        l1e->next = l2;
+        l2e->next = nextl1;
+    }
+    else /* swap word1->word2->[word3]->word4->[word5] ...*/
+    {
+        //TODO: 2 case  aaa l1 bbb l2 ccc | aaa l2 bbb l1 ccc
+        if ((*list)->head != l1)
+            prl1->next = l2;
+        else
+           (*list)->head = l2;
 
-    l1e->next = nextl2;
+        l2e->next = nextl1;
+
+        if ((*list)->head != l2)
+            prl2->next = l1;
+        else
+         (*list)->head = l1;
+
+        l1e->next = nextl2;
+    }
 }
 
 /**
@@ -313,6 +338,7 @@ sItem *find_start_word(sList **list, const char *word, size_t len)
         {
             p = word;
             len_check = 0;
+            res = NULL;
         }
         tmp = tmp->next;
 
@@ -339,8 +365,10 @@ int main()
         // item_insert_top(list, 'a');
 
         list_print(&list);
-        f1 = find_start_word(&list, "hey", strlen("hey"));
-        f2 = find_start_word(&list, "all", strlen("all"));
+        //f1 = find_start_word(&list, "hey", strlen("hey"));
+        //f2 = find_start_word(&list, "all", strlen("all"));
+         f2 = find_start_word(&list, "hey", strlen("hey"));
+         f1 = find_start_word(&list, "all", strlen("all"));
         swap_word(&list, f1, f2);
         list_print(&list);
         printf("list len ->%d\n", list_len(&list));
