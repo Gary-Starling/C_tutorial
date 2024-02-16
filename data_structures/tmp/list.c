@@ -272,20 +272,27 @@ void swap_word(sList **list, sItem *l1, sItem *l2)
     }
     else /* swap word1->word2->[word3]->word4->[word5] ...*/
     {
-        //TODO: 2 case  aaa l1 bbb l2 ccc | aaa l2 bbb l1 ccc
+        // TODO: 2 case  aaa l1 bbb l2 ccc | aaa l2 bbb l1 ccc
+        // hey xxx xxx all Error
         if ((*list)->head != l1)
+        {
+            l2e->next = nextl1;
+            l1e->next = nextl2;
             prl1->next = l2;
+             (*list)->head = l1;
+        }
         else
-           (*list)->head = l2;
-
-        l2e->next = nextl1;
-
-        if ((*list)->head != l2)
+        {
+            l2e->next = nextl1;
+            l1e->next = nextl2;
             prl2->next = l1;
-        else
-         (*list)->head = l1;
+            (*list)->head = l2;
+        }
 
-        l1e->next = nextl2;
+        // if ((*list)->head != l2)
+        //     prl2->next = l1;
+        // else
+        //  (*list)->head = l1;
     }
 }
 
@@ -364,11 +371,9 @@ int main()
         // item_insert_top(list, 'b');
         // item_insert_top(list, 'a');
 
-        list_print(&list);
-        //f1 = find_start_word(&list, "hey", strlen("hey"));
-        //f2 = find_start_word(&list, "all", strlen("all"));
-         f2 = find_start_word(&list, "hey", strlen("hey"));
-         f1 = find_start_word(&list, "all", strlen("all"));
+        // list_print(&list);
+        f1 = find_start_word(&list, "hey", strlen("hey"));
+        f2 = find_start_word(&list, "all", strlen("all"));
         swap_word(&list, f1, f2);
         list_print(&list);
         printf("list len ->%d\n", list_len(&list));
