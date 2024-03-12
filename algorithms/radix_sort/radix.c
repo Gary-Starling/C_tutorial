@@ -1,22 +1,50 @@
 #include <stdio.h>
 #include <stdlib.h>
-
-int arr_in[7] = {10, 202, 3, 235, 7, 9, 12};
-int arr_out[7] = {0};
+#include <time.h>
 
 // decimal
 #define _SYST (10)
+#define _PRINT_OUT_ _NO_
+#define _NO_ 0
+#define _YES_ 1
+#define N (102400U)
+//Sorting time 0.0080 sec.
 
-void print_arr(int *arr, unsigned int size);
 int get_max(int *arr, unsigned int size);
-void count_sort(int *arr, int *buff, unsigned int size, unsigned int place);
+void sort(int *arr, int *buff, unsigned int size, unsigned int place);
 void radix_sort(int *arr, unsigned int size);
+void arr_print(int *arr, unsigned int len);
+
+int arr_in[N];
 
 int main(int argc, char const *argv[])
 {
-    print_arr(arr_in, 7);
-    printf("%d\n", get_max(arr_in, 7));
-    radix_sort(arr_in, 7);
+
+    double st, end;
+    unsigned int len = (sizeof(arr_in) / sizeof(int));
+
+    srand(time(NULL));
+
+    /* fill array */
+    for (unsigned int i = 0; i < len; i++)
+        arr_in[i] = rand() % len;
+
+#if _PRINT_OUT_ == _YES_
+    printf("\nUnsorted\n");
+    arr_print(arr_in, len);
+#endif
+
+    st = clock();
+    radix_sort(arr_in, len);
+    end = clock();
+
+#if _PRINT_OUT_ == _YES_
+    printf("\nSorted\n");
+    arr_print(arr_in, len);
+#endif
+
+    printf("Sorting time %.4lf sec.\n", (double)((end - st) / CLK_TCK));
+
     return 0;
 }
 
@@ -25,16 +53,24 @@ int get_max(int *arr, unsigned int size)
     int max = arr[0];
 
     for (unsigned int indx = 0; indx < size; indx++)
+    {
         if (max < arr[indx])
             max = arr[indx];
-
+    }
     return max;
 }
 
-void print_arr(int *arr, unsigned int size)
+/**
+ * @brief Print all elements of array
+ *
+ * @param arr - pointer to array
+ * @param len - length of array
+ */
+void arr_print(int *arr, unsigned int len)
 {
-    for (unsigned int indx = 0; indx < size; indx++)
-        printf("%d ", arr[indx]);
+    for (unsigned int i = 0; i < len; i++)
+        printf("%d ", arr[i]);
+
     printf("\n");
 }
 
@@ -47,41 +83,45 @@ void radix_sort(int *arr, unsigned int size)
     }
 
     int max = get_max(arr, size);                    // get maximum from array
-    //int *buff = malloc(size * sizeof(unsigned int)); // buffer for data recovery after one sorting pass
+    int *buff = malloc(size * sizeof(unsigned int)); // buffer for data recovery after one sorting pass
 
-    // if (buff == NULL)
-    // {
-    //     printf("memory allocated error\n");
-    //     exit(1);
-    // }
+    if (buff == NULL)
+    {
+        printf("memory allocated error\n");
+        exit(1);
+    }
 
     // numbers of iterations
     // for example max = 123; place = 1 -> 12[3]; place = 10 -> 1[2]3 ....
     for (unsigned int place = 1; (max / place) > 0; place *= 10)
-        count_sort(arr, arr_out, size, place);
+        sort(arr, buff, size, place);
+
+    free(buff);
 }
 
-void count_sort(int *arr, int *buff, unsigned int size, unsigned int place)
+void sort(int *arr, int *buff, unsigned int size, unsigned int place)
 {
-    // place here sorting
-
     unsigned int count[_SYST] = {0}; // decimal(0-9)
-    // int max = (arr[0]/place) % 10;
+    unsigned int n;
+    int i;
 
-    for (unsigned int i = 0; i < size; i++)
+    // count sort
+    for (i = 0; i < size; i++)
         count[(arr[i] / place) % 10]++;
 
-    for (unsigned int i = 0; i < _SYST; i++)
-    {
-        for (unsigned int j = 0; j < count[i]; j++)
-            printf("%d ", i);
+    // calculate real number in output array
+    for (unsigned int i = 1; i < 10; i++)
+        count[i] += count[i - 1];
 
-        printf("\n");
+    // out array
+    for (i = size - 1; i >= 0; i--)
+    {
+        n = (arr[i] / place) % 10;
+        buff[count[n] - 1] = arr[i];
+        count[n]--;
     }
-    
-    // for (unsigned int i = 0; i < size; i++)
-    // {
-    //     buff[ count[(arr[i] / place) % 10] ] = arr[i];
-    //     count[(arr[i] / place) % 10]--;
-    // }
+
+    // copy to arr
+    for (i = 0; i < size; i++)
+        arr[i] = buff[i];
 }
