@@ -4,10 +4,10 @@
 
 // decimal
 #define _SYST (10)
-#define _PRINT_OUT_ _NO_
+#define _PRINT_OUT_ _YES_
 #define _NO_ 0
 #define _YES_ 1
-#define N (102400U)
+#define N (512)
 //Sorting time 0.0080 sec.
 
 int get_max(int *arr, unsigned int size);
