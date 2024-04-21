@@ -43,7 +43,7 @@ int main(int argc, char const *argv[])
     arr_print(arr_in, len);
 #endif
 
-    printf("Sorting time %.4lf sec.\n", (double)((end - st) / CLK_TCK));
+    printf("Sorting time %.4lf sec.\n", (double)((end - st) / CLOCKS_PER_SEC));
 
     return 0;
 }
