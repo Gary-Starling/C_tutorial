@@ -10,6 +10,7 @@ typedef int data;
 #define N (102400U)
 
 //result on my PC Sorting time 0.0456 sec
+//TODO graph results
 
 void arr_to_max_heap(data *arr, unsigned int size, unsigned int i);
 void swap(data *a, data *b);
